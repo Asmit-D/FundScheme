@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Verify — ExcessScheme</title>
+  <script>document.documentElement.setAttribute('data-theme',localStorage.getItem('es-theme')||'dark')</script>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/ai.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+</head>
+<body class="ai-page">
+
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a class="nav-brand" href="index.html">
+        <span class="brand-icon">⬡</span>
+        <span class="brand-name">ExcessScheme</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="gov-dashboard.html">Gov Portal</a></li>
+        <li><a href="user-dashboard.html">Student Portal</a></li>
+        <li><a href="ai-verify.html" class="btn-nav">AI Verify</a></li>
+        <li><button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"></button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="ai-hero">
+    <div class="ai-hero-inner">
+      <div class="hero-badge"><span class="badge-dot"></span> Powered by Multi-Model AI</div>
+      <h1 class="hero-title">
+        Verify Your Identity.<br/>
+        <span class="gradient-text">Claim Your Scholarship.</span>
+      </h1>
+      <p style="color:var(--text-2);font-size:1.05rem;max-width:520px;margin:0 auto 2.5rem;text-align:center;line-height:1.7">
+        Our AI engine validates your documents, cross-checks your identity, detects fraud, 
+        and generates an on-chain trust proof in under 10 seconds.
+      </p>
+    </div>
+  </div>
+
+  <div class="ai-container">
+
+    <!-- ── UPLOAD PANEL ── -->
+    <div class="ai-upload-panel">
+      <h2 class="ai-section-title">Step 1 — Upload Documents</h2>
+      <div class="upload-grid">
+        <div class="upload-zone" id="zone-aadhaar" onclick="triggerUpload('aadhaar')">
+          <input type="file" id="file-aadhaar" accept="image/*,application/pdf" onchange="fileSelected(this,'aadhaar')"/>
+          <div class="uz-icon">🪪</div>
+          <div class="uz-title">Aadhaar Card</div>
+          <div class="uz-sub">JPG, PNG or PDF · Max 5MB</div>
+          <div class="uz-status" id="status-aadhaar">Click to upload</div>
+        </div>
+        <div class="upload-zone" id="zone-marksheet" onclick="triggerUpload('marksheet')">
+          <input type="file" id="file-marksheet" accept="image/*,application/pdf" onchange="fileSelected(this,'marksheet')"/>
+          <div class="uz-icon">📄</div>
+          <div class="uz-title">Marksheet</div>
+          <div class="uz-sub">Latest semester marksheet</div>
+          <div class="uz-status" id="status-marksheet">Click to upload</div>
+        </div>
+        <div class="upload-zone" id="zone-income" onclick="triggerUpload('income')">
+          <input type="file" id="file-income" accept="image/*,application/pdf" onchange="fileSelected(this,'income')"/>
+          <div class="uz-icon">💸</div>
+          <div class="uz-title">Income Certificate</div>
+          <div class="uz-sub">Family income proof</div>
+          <div class="uz-status" id="status-income">Click to upload</div>
+        </div>
+        <div class="upload-zone" id="zone-bank" onclick="triggerUpload('bank')">
+          <input type="file" id="file-bank" accept="image/*,application/pdf" onchange="fileSelected(this,'bank')"/>
+          <div class="uz-icon">🏦</div>
+          <div class="uz-title">Bank Passbook</div>
+          <div class="uz-sub">First page with account details</div>
+          <div class="uz-status" id="status-bank">Click to upload</div>
+        </div>
+      </div>
+
+      <!-- Step 2: Student Info -->
+      <h2 class="ai-section-title" style="margin-top:2.5rem">Step 2 — Student Details</h2>
+      <div class="stu-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name (as per Aadhaar)</label>
+            <input type="text" id="aiName" placeholder="e.g. Priya Kumari"/>
+          </div>
+          <div class="form-group">
+            <label>Date of Birth</label>
+            <input type="date" id="aiDob"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Aadhaar Number</label>
+            <input type="text" id="aiAadhaar" placeholder="XXXX XXXX XXXX" maxlength="14"/>
+          </div>
+          <div class="form-group">
+            <label>Student ID</label>
+            <input type="text" id="aiStudentId" placeholder="STU-2026-XXXX"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Institution Name</label>
+            <input type="text" id="aiInstitute" placeholder="e.g. IIT Delhi"/>
+          </div>
+          <div class="form-group">
+            <label>Annual Family Income (₹)</label>
+            <input type="number" id="aiIncome" placeholder="e.g. 120000"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Bank Account Number</label>
+          <input type="text" id="aiBank" placeholder="Account number"/>
+        </div>
+      </div>
+
+      <button class="btn-primary" style="margin-top:2rem;font-size:1rem;padding:.9rem 2.5rem" onclick="runAIVerification()">
+        🤖 Run AI Verification
+      </button>
+    </div>
+
+    <!-- ── AI ENGINE OUTPUT ── -->
+    <div class="ai-output-panel">
+      <h2 class="ai-section-title">AI Verification Engine</h2>
+
+      <div class="ai-engine-card" id="aiEngineCard">
+        <div class="ae-header">
+          <span class="ae-title">Verification Pipeline</span>
+          <span class="ae-status" id="aeStatus">Idle</span>
+        </div>
+
+        <div class="ae-pipeline" id="aePipeline">
+          <!-- Steps filled by JS -->
+        </div>
+
+        <div class="ae-progress-wrap" id="aeProgressWrap" style="display:none">
+          <div class="ae-progress-bar">
+            <div class="ae-progress-fill" id="aeProgressFill"></div>
+          </div>
+          <span class="ae-progress-label" id="aeProgressLabel">Initializing…</span>
+        </div>
+
+        <div class="ae-result" id="aeResult" style="display:none">
+          <div class="aer-score-section">
+            <div class="aer-score-ring" id="aerScoreRing">
+              <svg viewBox="0 0 120 120" class="ring-svg">
+                <circle cx="60" cy="60" r="50" class="ring-bg"/>
+                <circle cx="60" cy="60" r="50" class="ring-fill" id="ringFill"
+                  stroke-dasharray="0 314"/>
+              </svg>
+              <div class="ring-inner">
+                <span class="ring-score" id="ringScore">—</span>
+                <span class="ring-label">Trust</span>
+              </div>
+            </div>
+            <div class="aer-details" id="aerDetails"></div>
+          </div>
+          <div class="aer-hash" id="aerHash"></div>
+          <div class="aer-actions" id="aerActions"></div>
+        </div>
+      </div>
+
+      <!-- Known Fraud Patterns -->
+      <div class="fraud-patterns-card">
+        <h3>AI Fraud Detection Patterns</h3>
+        <div class="fp-list" id="fpList"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── HOW AI WORKS ── -->
+  <section class="section" style="background:var(--bg-2)">
+    <div class="container">
+      <div class="section-label" style="text-align:center">Under the Hood</div>
+      <h2 class="section-title">How the AI Engine Works</h2>
+      <div class="ai-how-grid">
+        <div class="ahg-card">
+          <div class="ahg-icon">🔍</div>
+          <h4>OCR Extraction</h4>
+          <p>Vision model extracts all text, numbers, and fields from uploaded documents.</p>
+        </div>
+        <div class="ahg-card">
+          <div class="ahg-icon">🧬</div>
+          <h4>Cross-Reference Check</h4>
+          <p>Extracted data is matched against the national student identity graph.</p>
+        </div>
+        <div class="ahg-card">
+          <div class="ahg-icon">🕵️</div>
+          <h4>Forgery Detection</h4>
+          <p>CNN-based model analyzes document metadata, fonts, and pixel patterns for tampering.</p>
+        </div>
+        <div class="ahg-card">
+          <div class="ahg-icon">👥</div>
+          <h4>Duplicate Detection</h4>
+          <p>Vector embedding search finds any previously verified identity with overlapping details.</p>
+        </div>
+        <div class="ahg-card">
+          <div class="ahg-icon">📊</div>
+          <h4>Income Validation</h4>
+          <p>ML model cross-checks stated income against geoeconomic markers and bank records.</p>
+        </div>
+        <div class="ahg-card">
+          <div class="ahg-icon">🔗</div>
+          <h4>On-Chain Proof</h4>
+          <p>Verification result is hashed and anchored on Algorand — tamper-proof and auditable.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="brand-icon">⬡</span>
+        <span class="brand-name">ExcessScheme</span>
+        <p>Transparent. Tokenized. Trustworthy.</p>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2026 ExcessScheme — Hackathon Project</div>
+  </footer>
+
+  <script src="js/theme.js"></script>
+  <script src="js/ai-verify.js"></script>
+</body>
+</html>

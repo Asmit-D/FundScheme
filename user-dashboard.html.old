@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Dashboard — ExcessScheme</title>
+  <script>document.documentElement.setAttribute('data-theme',localStorage.getItem('es-theme')||'dark')</script>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/dashboard.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+</head>
+<body class="dash-body">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">⬡</span>
+      <span class="brand-name">ExcessScheme</span>
+    </div>
+    <div class="sidebar-role-badge">
+      <span class="role-dot user-dot"></span>
+      <span>Student Portal</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="snav-item active" data-tab="my-overview">
+        <span class="snav-icon">🏠</span> My Overview
+      </a>
+      <a href="#" class="snav-item" data-tab="browse-schemes">
+        <span class="snav-icon">🔍</span> Browse Schemes
+      </a>
+      <a href="#" class="snav-item" data-tab="my-applications">
+        <span class="snav-icon">📋</span> My Applications
+      </a>
+      <a href="#" class="snav-item" data-tab="my-tokens">
+        <span class="snav-icon">🪙</span> My Tokens
+      </a>
+      <a href="#" class="snav-item" data-tab="ai-verify">
+        <span class="snav-icon">🤖</span> AI Verify Me
+      </a>
+      <a href="#" class="snav-item" data-tab="bridge-mode">
+        <span class="snav-icon">🌉</span> Bridge Mode
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="su-avatar user-avatar">PK</div>
+        <div class="su-info">
+          <span class="su-name">Priya Kumari</span>
+          <span class="su-id">STU-2026-0042</span>
+        </div>
+      </div>
+      <a href="index.html" class="logout-btn">⏻ Logout</a>
+    </div>
+  </aside>
+
+  <main class="dash-main">
+    <header class="dash-topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="topbar-title" id="tabTitle">My Overview</div>
+      </div>
+      <div class="topbar-right">
+        <div class="verify-status" id="verifyBadge">
+          <span class="ai-dot green"></span> AI Verified
+        </div>
+        <button class="notif-btn">🔔</button>
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"></button>
+      </div>
+    </header>
+
+    <!-- ── MY OVERVIEW ── -->
+    <div class="tab-content active" id="tab-my-overview">
+      <div class="dash-welcome">
+        <div>
+          <h1>Hello, Priya! 👩‍🎓</h1>
+          <p>Your scholarship journey at a glance.</p>
+        </div>
+        <div class="welcome-date">STU-2026-0042 · 2nd Year, CSE</div>
+      </div>
+
+      <!-- Profile KPIs -->
+      <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="kpi-card kpi-accent">
+          <div class="kpi-top"><span class="kpi-label">My Tokens</span><span class="kpi-icon">🪙</span></div>
+          <span class="kpi-val" data-count="3">0</span>
+          <span class="kpi-trend up">2 Redeemable</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top"><span class="kpi-label">Applied</span><span class="kpi-icon">📋</span></div>
+          <span class="kpi-val" data-count="4">0</span>
+          <span class="kpi-trend up">2 Approved</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top"><span class="kpi-label">Earned (₹)</span><span class="kpi-icon">💰</span></div>
+          <span class="kpi-val" data-prefix="₹" data-count="85000">0</span>
+          <span class="kpi-trend up">₹42,000 pending</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top"><span class="kpi-label">Trust Score</span><span class="kpi-icon">🤖</span></div>
+          <span class="kpi-val" data-count="87" data-suffix="/100">0</span>
+          <span class="kpi-trend up">AI Verified</span>
+        </div>
+      </div>
+
+      <!-- Token Status Timeline -->
+      <div class="charts-row">
+        <div class="chart-card wide">
+          <div class="chart-title">Token Journey Timeline</div>
+          <div class="timeline" id="userTimeline"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">My Trust Score</div>
+          <div class="trust-gauge" id="trustGauge">
+            <div class="gauge-wrap">
+              <canvas id="gaugeCanvas" width="200" height="120"></canvas>
+              <div class="gauge-val">87<span>/100</span></div>
+            </div>
+            <div class="gauge-checks" id="gaugeChecks"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- My Scholarships Quick View -->
+      <div class="table-card" style="margin-top:1.5rem">
+        <div class="table-card-header">
+          <span class="chart-title">My Active Scholarships</span>
+          <a href="#" class="view-all" onclick="switchTab('my-applications')">View All →</a>
+        </div>
+        <div id="myScholarshipsList"></div>
+      </div>
+    </div>
+
+    <!-- ── BROWSE SCHEMES ── -->
+    <div class="tab-content" id="tab-browse-schemes">
+      <div class="tab-header-row">
+        <div><h2>Browse Schemes</h2><p>Find and apply to scholarships you're eligible for.</p></div>
+      </div>
+      <div class="filter-bar">
+        <input type="text" placeholder="Search schemes…" class="filter-input" id="browseSearch" oninput="filterBrowseSchemes()"/>
+        <select class="filter-select" id="browseCat" onchange="filterBrowseSchemes()">
+          <option value="">All Categories</option>
+          <option value="Merit">Merit</option>
+          <option value="Need-Based">Need-Based</option>
+          <option value="Disability">Disability</option>
+          <option value="Minority">Minority</option>
+        </select>
+        <select class="filter-select" id="browseAmt" onchange="filterBrowseSchemes()">
+          <option value="">Any Amount</option>
+          <option value="low">Below ₹20K</option>
+          <option value="mid">₹20K–₹60K</option>
+          <option value="high">Above ₹60K</option>
+        </select>
+      </div>
+      <div class="schemes-grid" id="browseGrid"></div>
+    </div>
+
+    <!-- ── MY APPLICATIONS ── -->
+    <div class="tab-content" id="tab-my-applications">
+      <div class="tab-header-row">
+        <div><h2>My Applications</h2><p>Track all your scholarship applications.</p></div>
+      </div>
+      <div class="apps-list" id="myAppsList"></div>
+    </div>
+
+    <!-- ── MY TOKENS ── -->
+    <div class="tab-content" id="tab-my-tokens">
+      <div class="tab-header-row">
+        <div><h2>My Token Wallet</h2><p>Your verified scholarship tokens and redemption status.</p></div>
+      </div>
+      <div class="tokens-wallet" id="tokensWallet"></div>
+    </div>
+
+    <!-- ── AI VERIFY ME ── -->
+    <div class="tab-content" id="tab-ai-verify">
+      <div class="tab-header-row">
+        <div><h2>AI Verification</h2><p>Complete your identity verification to access scholarship tokens.</p></div>
+      </div>
+      <div class="ai-verify-layout">
+        <div class="verify-steps-card">
+          <h3>Verification Steps</h3>
+          <div class="vsteps" id="vSteps"></div>
+          <button class="btn-primary" style="margin-top:1.5rem;width:100%" onclick="startVerification()">
+            🚀 Start AI Verification
+          </button>
+        </div>
+        <div class="verify-progress-card">
+          <h3>Verification Engine</h3>
+          <div class="ai-scan" id="verifyEngine" style="margin-top:1rem"></div>
+          <div class="trust-score" style="margin-top:1.4rem">
+            <span>Trust Score</span>
+            <div class="score-bar"><div class="score-fill" id="studentScoreFill" style="width:0%"></div></div>
+            <span class="score-val" id="studentScoreVal">—</span>
+          </div>
+          <div class="verify-result" id="verifyResult"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BRIDGE MODE ── -->
+    <div class="tab-content" id="tab-bridge-mode">
+      <div class="tab-header-row">
+        <div><h2>Bridge Mode</h2><p>As a bridge student, collect and distribute scholarship tokens atomically.</p></div>
+        <div class="bridge-status-badge" id="bridgeStatus">
+          <span class="ai-dot"></span> Not Assigned
+        </div>
+      </div>
+      <div class="bridge-layout">
+        <div class="bridge-info-card">
+          <div class="bi-icon">🌉</div>
+          <h3>What is Bridge Mode?</h3>
+          <p>A bridge student is a trusted intermediary designated by the government to collect the full scholarship token batch for a scheme and atomically distribute tokens to each verified student.</p>
+          <ul class="ai-checks" style="margin-top:1rem">
+            <li><span class="check">✓</span> Receives batch token from Gov</li>
+            <li><span class="check">✓</span> Validates each recipient on-chain</li>
+            <li><span class="check">✓</span> Atomically distributes tokens</li>
+            <li><span class="check">✓</span> Full audit trail created</li>
+          </ul>
+        </div>
+        <div class="bridge-panel">
+          <div class="bridge-batch-card" id="bridgeBatch">
+            <h3>Active Batch</h3>
+            <div id="batchInfo"></div>
+          </div>
+          <div class="bridge-distribute-card">
+            <h3>Distribute Tokens</h3>
+            <div id="distributeList"></div>
+            <button class="btn-primary" style="margin-top:1rem;width:100%" onclick="distributeAll()">
+              ⚡ Distribute All Verified
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Apply Modal -->
+  <div class="modal-overlay" id="applyModal">
+    <div class="modal-box" style="max-width:480px">
+      <button class="modal-close" onclick="closeModal('applyModal')">✕</button>
+      <h2 class="modal-title">Apply for Scheme</h2>
+      <p class="modal-sub" id="applyModalSub">Fill in your details</p>
+      <form class="modal-form" onsubmit="submitApplication(event)">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" value="Priya Kumari" id="appName"/>
+        </div>
+        <div class="form-group">
+          <label>Student ID</label>
+          <input type="text" value="STU-2026-0042" id="appId" readonly/>
+        </div>
+        <div class="form-group">
+          <label>Annual Income (₹)</label>
+          <input type="number" placeholder="e.g. 120000" id="appIncome"/>
+        </div>
+        <div class="form-group">
+          <label>Upload Marksheet (PDF/Image)</label>
+          <input type="file" id="appDoc" style="color:var(--text-2)"/>
+        </div>
+        <div class="form-group">
+          <label>Bank Account Number</label>
+          <input type="text" placeholder="e.g. 1234567890" id="appBank"/>
+        </div>
+        <button type="submit" class="btn-primary w-full">Submit Application</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/theme.js"></script>
+  <script src="js/dashboard-data.js"></script>
+  <script src="js/user-dashboard.js"></script>
+</body>
+</html>

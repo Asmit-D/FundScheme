@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gov Dashboard — ExcessScheme</title>
+  <script>document.documentElement.setAttribute('data-theme',localStorage.getItem('es-theme')||'dark')</script>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/dashboard.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+</head>
+<body class="dash-body">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">⬡</span>
+      <span class="brand-name">ExcessScheme</span>
+    </div>
+    <div class="sidebar-role-badge">
+      <span class="role-dot gov-dot"></span>
+      <span>Government Officer</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="snav-item active" data-tab="overview">
+        <span class="snav-icon">📊</span> Overview
+      </a>
+      <a href="#" class="snav-item" data-tab="schemes">
+        <span class="snav-icon">📋</span> Manage Schemes
+      </a>
+      <a href="#" class="snav-item" data-tab="tokenize">
+        <span class="snav-icon">🪙</span> Tokenize Funds
+      </a>
+      <a href="#" class="snav-item" data-tab="applications">
+        <span class="snav-icon">📥</span> Applications
+      </a>
+      <a href="#" class="snav-item" data-tab="ai-flags">
+        <span class="snav-icon">🤖</span> AI Flags
+        <span class="nav-badge">7</span>
+      </a>
+      <a href="#" class="snav-item" data-tab="reports">
+        <span class="snav-icon">📜</span> Audit Reports
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user">
+        <div class="su-avatar gov-avatar">GO</div>
+        <div class="su-info">
+          <span class="su-name">Rajesh Kumar</span>
+          <span class="su-id">GOV-2026-001</span>
+        </div>
+      </div>
+      <a href="index.html" class="logout-btn">⏻ Logout</a>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ── -->
+  <main class="dash-main">
+    <!-- TOP BAR -->
+    <header class="dash-topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="topbar-title" id="tabTitle">Overview</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-search">
+          <input type="text" placeholder="Search schemes, students…"/>
+        </div>
+        <button class="notif-btn">
+          🔔 <span class="notif-count">7</span>
+        </button>
+        <div class="topbar-chain">
+          <span class="chain-dot"></span>
+          <span>MainNet</span>
+        </div>
+        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"></button>
+      </div>
+    </header>
+
+    <!-- ── TAB: OVERVIEW ── -->
+    <div class="tab-content active" id="tab-overview">
+      <div class="dash-welcome">
+        <div>
+          <h1>Welcome back, Rajesh 👋</h1>
+          <p>Here's your government scheme management overview for today.</p>
+        </div>
+        <div class="welcome-date">Feb 19, 2026 · 09:44 AM</div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Total Schemes</span>
+            <span class="kpi-icon">📋</span>
+          </div>
+          <span class="kpi-val" data-count="348">0</span>
+          <span class="kpi-trend up">↑ 12 this month</span>
+        </div>
+        <div class="kpi-card kpi-accent">
+          <div class="kpi-top">
+            <span class="kpi-label">Tokens Issued</span>
+            <span class="kpi-icon">🪙</span>
+          </div>
+          <span class="kpi-val" data-count="124800">0</span>
+          <span class="kpi-trend up">↑ 2,400 this week</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Fund Pool (₹)</span>
+            <span class="kpi-icon">💰</span>
+          </div>
+          <span class="kpi-val" data-prefix="₹" data-count="420000000" data-short="true">0</span>
+          <span class="kpi-trend up">↑ ₹4.2Cr added</span>
+        </div>
+        <div class="kpi-card kpi-warn">
+          <div class="kpi-top">
+            <span class="kpi-label">AI Fraud Flags</span>
+            <span class="kpi-icon">⚠️</span>
+          </div>
+          <span class="kpi-val" data-count="7">0</span>
+          <span class="kpi-trend down">↑ 3 new today</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Students Verified</span>
+            <span class="kpi-icon">🎓</span>
+          </div>
+          <span class="kpi-val" data-count="12400">0</span>
+          <span class="kpi-trend up">↑ 340 pending</span>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <span class="kpi-label">Redemption Rate</span>
+            <span class="kpi-icon">✅</span>
+          </div>
+          <span class="kpi-val" data-count="94.2" data-suffix="%">0</span>
+          <span class="kpi-trend up">↑ 2.1% vs last month</span>
+        </div>
+      </div>
+
+      <!-- Charts Row -->
+      <div class="charts-row">
+        <div class="chart-card wide">
+          <div class="chart-title">Token Distribution — Last 12 Months</div>
+          <canvas id="tokenChart" height="200"></canvas>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Scheme Categories</div>
+          <canvas id="schemeDonut" height="200"></canvas>
+        </div>
+      </div>
+
+      <!-- Recent Activity + Top Schemes -->
+      <div class="tables-row">
+        <div class="table-card">
+          <div class="table-card-header">
+            <span class="chart-title">Recent Transactions</span>
+          </div>
+          <table class="dash-table">
+            <thead>
+              <tr><th>Tx Hash</th><th>Scheme</th><th>Amount</th><th>Status</th></tr>
+            </thead>
+            <tbody id="txTableBody"></tbody>
+          </table>
+        </div>
+        <div class="table-card">
+          <div class="table-card-header">
+            <span class="chart-title">AI Alerts Feed</span>
+            <a href="#" class="view-all" onclick="switchTab('ai-flags')">See All →</a>
+          </div>
+          <div class="alerts-feed" id="alertsFeed"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: SCHEMES MANAGER ── -->
+    <div class="tab-content" id="tab-schemes">
+      <div class="tab-header-row">
+        <div>
+          <h2>Scheme Manager</h2>
+          <p>Create, update and monitor all government scholarship schemes.</p>
+        </div>
+        <button class="btn-primary" onclick="openCreateScheme()">+ New Scheme</button>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" placeholder="Search by scheme name, ID…" class="filter-input" id="schemeSearch" oninput="filterSchemes()"/>
+        <select class="filter-select" id="schemeStatus">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="draft">Draft</option>
+          <option value="closed">Closed</option>
+        </select>
+        <select class="filter-select" id="schemeCat">
+          <option value="">All Categories</option>
+          <option value="merit">Merit</option>
+          <option value="need">Need-Based</option>
+          <option value="disability">Disability</option>
+          <option value="minority">Minority</option>
+        </select>
+      </div>
+
+      <div class="schemes-grid" id="schemesGrid"></div>
+    </div>
+
+    <!-- ── TAB: TOKENIZE FUNDS ── -->
+    <div class="tab-content" id="tab-tokenize">
+      <div class="tab-header-row">
+        <div>
+          <h2>Tokenize Scholarship Funds</h2>
+          <p>Lock government treasury funds and mint verifiable tokens per student.</p>
+        </div>
+      </div>
+
+      <div class="tokenize-layout">
+        <div class="tokenize-form-card">
+          <h3>Create Token Batch</h3>
+          <form id="tokenizeForm" class="modal-form" style="margin-top:1.4rem" onsubmit="mintTokens(event)">
+            <div class="form-group">
+              <label>Select Scheme</label>
+              <select class="filter-select" id="tkScheme" style="width:100%">
+                <option>PM National Scholarship 2026</option>
+                <option>State Merit Award</option>
+                <option>SC/ST Higher Education Fund</option>
+                <option>Girl Child STEM Scholarship</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Total Fund Amount (₹)</label>
+              <input type="number" placeholder="e.g. 5000000" id="tkAmount"/>
+            </div>
+            <div class="form-group">
+              <label>Number of Beneficiaries</label>
+              <input type="number" placeholder="e.g. 500" id="tkCount"/>
+            </div>
+            <div class="form-group">
+              <label>Token Value per Student (₹)</label>
+              <input type="number" placeholder="Auto-calc" id="tkPerStudent" readonly/>
+            </div>
+            <div class="form-group">
+              <label>Bridge Student ID</label>
+              <input type="text" placeholder="e.g. STU-2026-0042" id="tkBridge"/>
+            </div>
+            <div class="form-group">
+              <label>Lock Until</label>
+              <input type="date" id="tkLock"/>
+            </div>
+            <button type="submit" class="btn-primary w-full">⚡ Mint Tokens</button>
+          </form>
+        </div>
+
+        <div class="tokenize-preview">
+          <h3>Live Token Preview</h3>
+          <div class="token-preview-card" id="tokenPreview">
+            <div class="tpc-header">
+              <span class="tpc-badge">SCHEME TOKEN</span>
+              <span class="tpc-id">SCH-TOKEN-????</span>
+            </div>
+            <div class="tpc-grid">
+              <div class="tpc-item"><span class="tpc-l">Scheme</span><span class="tpc-v" id="prev-scheme">—</span></div>
+              <div class="tpc-item"><span class="tpc-l">Fund Pool</span><span class="tpc-v" id="prev-amount">—</span></div>
+              <div class="tpc-item"><span class="tpc-l">Beneficiaries</span><span class="tpc-v" id="prev-count">—</span></div>
+              <div class="tpc-item"><span class="tpc-l">Per Student</span><span class="tpc-v accent" id="prev-per">—</span></div>
+              <div class="tpc-item"><span class="tpc-l">Bridge ID</span><span class="tpc-v" id="prev-bridge">—</span></div>
+              <div class="tpc-item"><span class="tpc-l">Locked Until</span><span class="tpc-v" id="prev-lock">—</span></div>
+            </div>
+            <div class="tpc-footer">
+              Chain: <span>Algorand MainNet</span> &nbsp;·&nbsp; Status: <span class="accent">Pending Mint</span>
+            </div>
+          </div>
+
+          <div class="minted-list" id="mintedList">
+            <h4> Recent Mints</h4>
+            <div id="mintedItems"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB: APPLICATIONS ── -->
+    <div class="tab-content" id="tab-applications">
+      <div class="tab-header-row">
+        <div>
+          <h2>Student Applications</h2>
+          <p>Review, approve or reject pending scholarship applications.</p>
+        </div>
+      </div>
+      <div class="apps-filters">
+        <input type="text" placeholder="Search student name, ID…" class="filter-input"/>
+        <select class="filter-select">
+          <option>All Status</option>
+          <option>Pending Review</option>
+          <option>AI Verified</option>
+          <option>Approved</option>
+          <option>Rejected</option>
+        </select>
+      </div>
+      <div id="applicationsTable"></div>
+    </div>
+
+    <!-- ── TAB: AI FLAGS ── -->
+    <div class="tab-content" id="tab-ai-flags">
+      <div class="tab-header-row">
+        <div>
+          <h2>AI Fraud Flags</h2>
+          <p>Cases flagged by AI for human review. Investigate and resolve each alert.</p>
+        </div>
+        <div class="flag-summary">
+          <span class="fs-chip critical">3 Critical</span>
+          <span class="fs-chip warning">4 Warning</span>
+        </div>
+      </div>
+      <div id="flagsContainer"></div>
+    </div>
+
+    <!-- ── TAB: REPORTS ── -->
+    <div class="tab-content" id="tab-reports">
+      <div class="tab-header-row">
+        <div>
+          <h2>Audit Reports</h2>
+          <p>Download or view immutable audit trails for all scheme activities.</p>
+        </div>
+        <button class="btn-primary" onclick="generateReport()">⬇ Export Report</button>
+      </div>
+      <div class="reports-grid" id="reportsGrid"></div>
+    </div>
+
+  </main>
+
+  <!-- Create Scheme Modal -->
+  <div class="modal-overlay" id="schemeModal">
+    <div class="modal-box" style="max-width:560px">
+      <button class="modal-close" onclick="closeModal('schemeModal')">✕</button>
+      <h2 class="modal-title">Create New Scheme</h2>
+      <p class="modal-sub">Define scholarship parameters and eligibility</p>
+      <form class="modal-form" onsubmit="saveScheme(event)">
+        <div class="form-group">
+          <label>Scheme Name</label>
+          <input type="text" placeholder="e.g. PM National Scholarship 2026" id="sName" required/>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <select class="filter-select" style="width:100%" id="sCat">
+              <option>Merit</option><option>Need-Based</option>
+              <option>Disability</option><option>Minority</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Budget (₹ Cr)</label>
+            <input type="number" placeholder="e.g. 50" id="sBudget"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Beneficiaries</label>
+            <input type="number" placeholder="e.g. 5000" id="sBenef"/>
+          </div>
+          <div class="form-group">
+            <label>Deadline</label>
+            <input type="date" id="sDeadline"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Eligibility Criteria</label>
+          <textarea class="filter-input" rows="3" placeholder="Describe criteria…" id="sCriteria" style="resize:vertical"></textarea>
+        </div>
+        <button type="submit" class="btn-primary w-full">Create Scheme</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/theme.js"></script>
+  <script src="js/dashboard-data.js"></script>
+  <script src="js/gov-dashboard.js"></script>
+</body>
+</html>

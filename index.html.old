@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ExcessScheme — Tokenized Government Scholarships</title>
+  <script>document.documentElement.setAttribute('data-theme',localStorage.getItem('es-theme')||'dark')</script>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+</head>
+<body class="landing-page">
+
+  <!-- ── NAV ── -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a class="nav-brand" href="index.html">
+        <span class="brand-icon">⬡</span>
+        <span class="brand-name">ExcessScheme</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#how-it-works">How it Works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#ai">AI Verify</a></li>
+        <li><a href="#login-section" class="btn-nav">Get Started</a></li>
+        <li><button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme"></button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <canvas id="networkCanvas"></canvas>
+    <div class="hero-content">
+      <div class="hero-badge"><span class="badge-dot"></span> Blockchain · AI · Government</div>
+      <h1 class="hero-title">
+        Transparent Scholarship<br/>
+        <span class="gradient-text">Tokenization</span> on Chain
+      </h1>
+      <p class="hero-sub">
+        Government schemes are tokenized into verifiable digital assets.
+        AI validates every student identity. Zero scams. Full transparency.
+      </p>
+      <div class="hero-cta">
+        <a href="#login-section" class="btn-primary">Launch App</a>
+        <a href="#how-it-works" class="btn-ghost">How it Works ↓</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-val" data-count="12400">0</span>
+          <span class="stat-label">Scholarships Issued</span>
+        </div>
+        <div class="stat">
+          <span class="stat-val" data-count="348">0</span>
+          <span class="stat-label">Gov Schemes Active</span>
+        </div>
+        <div class="stat">
+          <span class="stat-val" data-prefix="₹" data-count="4200000000">0</span>
+          <span class="stat-label">Tokens Distributed</span>
+        </div>
+        <div class="stat">
+          <span class="stat-val" data-count="99.8" data-suffix="%">0</span>
+          <span class="stat-label">AI Verify Accuracy</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="token-orb">
+        <div class="orb-ring ring1"></div>
+        <div class="orb-ring ring2"></div>
+        <div class="orb-ring ring3"></div>
+        <div class="orb-core">
+          <span class="orb-icon">⬡</span>
+          <span class="orb-label">SCHEME<br/>TOKEN</span>
+        </div>
+        <div class="floating-card fc1">
+          <span class="fc-icon">🎓</span>
+          <span class="fc-txt">Student Verified</span>
+        </div>
+        <div class="floating-card fc2">
+          <span class="fc-icon">🏛️</span>
+          <span class="fc-txt">GOV Approved</span>
+        </div>
+        <div class="floating-card fc3">
+          <span class="fc-icon">🤖</span>
+          <span class="fc-txt">AI Validated</span>
+        </div>
+        <div class="floating-card fc4">
+          <span class="fc-icon">🔐</span>
+          <span class="fc-txt">On-Chain Proof</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── HOW IT WORKS ── -->
+  <section class="section" id="how-it-works">
+    <div class="container">
+      <div class="section-label">Process</div>
+      <h2 class="section-title">How ExcessScheme Works</h2>
+      <p class="section-sub">From government fund allocation to a student's wallet — fully traceable, tamper-proof.</p>
+      <div class="steps-flow">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-icon">🏛️</div>
+          <h3>Gov Officer Creates Scheme</h3>
+          <p>Officers define scholarship criteria, budget pool, eligibility rules, and token denomination per student.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-icon">🪙</div>
+          <h3>Funds Are Tokenized</h3>
+          <p>The treasury locks funds and mints verifiable tokens representing each scholarship allotment on-chain.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-icon">🤖</div>
+          <h3>AI Identity Verification</h3>
+          <p>Students submit credentials. Our AI model cross-checks documents, detects duplicates, and flags fraud in real-time.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-card">
+          <div class="step-num">04</div>
+          <div class="step-icon">🌉</div>
+          <h3>Bridge Student Distributes</h3>
+          <p>A trusted bridge student collects the batch tokens and routes them atomically to each verified recipient's wallet.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step-card">
+          <div class="step-num">05</div>
+          <div class="step-icon">✅</div>
+          <h3>Student Redeems</h3>
+          <p>Students redeem tokens in their dashboard. Every claim is logged on-chain — permanent, auditable, zero-leak.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FEATURES ── -->
+  <section class="section section-dark" id="features">
+    <div class="container">
+      <div class="section-label">Features</div>
+      <h2 class="section-title">Built for Trust at Scale</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🔗</div>
+          <h3>On-Chain Transparency</h3>
+          <p>Every rupee, every token, every transaction is immutably recorded. Public audits are always possible.</p>
+        </div>
+        <div class="feature-card featured">
+          <div class="feature-glow"></div>
+          <div class="feature-icon">🧠</div>
+          <h3>AI Fraud Detection</h3>
+          <p>Multi-model AI pipeline checks identity docs, detects forgeries, matches biometrics and flags duplicate claims within seconds.</p>
+          <a href="ai-verify.html" class="feature-link">Try AI Verify →</a>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🪙</div>
+          <h3>Scholarship Tokenization</h3>
+          <p>Scholarships are minted as unique tokens tied to student IDs — fully traceable from allocation to disbursement.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🏛️</div>
+          <h3>Gov Scheme Manager</h3>
+          <p>Officers create, modify and monitor live schemes. Real-time fund flow dashboards and automated compliance reports.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🌉</div>
+          <h3>Bridge Wallet System</h3>
+          <p>A single bridge student collects a token batch and atomically distributes to many — cutting gas and latency dramatically.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Analytics & Audit</h3>
+          <p>Interactive dashboards for both sides — track redemption rates, flag anomalies, export audit-ready reports.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── AI TEASER ── -->
+  <section class="section" id="ai">
+    <div class="container ai-split">
+      <div class="ai-text">
+        <div class="section-label">AI Layer</div>
+        <h2 class="section-title" style="text-align:left">AI That Knows<br/> Who You Are</h2>
+        <p>Our multi-model AI verification engine cross-references student records against a national identity graph, detects synthetic documents, and produces a trust score in under 3 seconds.</p>
+        <ul class="ai-checks">
+          <li><span class="check">✓</span> Document authenticity detection</li>
+          <li><span class="check">✓</span> Duplicate beneficiary detection</li>
+          <li><span class="check">✓</span> Biometric liveness check</li>
+          <li><span class="check">✓</span> Bank account ownership verification</li>
+          <li><span class="check">✓</span> Real-time scam pattern flagging</li>
+        </ul>
+        <a href="ai-verify.html" class="btn-primary" style="display:inline-block;margin-top:2rem;">See AI Verify</a>
+      </div>
+      <div class="ai-visual">
+        <div class="ai-card">
+          <div class="ai-card-header">
+            <span class="ai-dot green"></span>
+            <span>AI Verification Engine</span>
+          </div>
+          <div class="ai-scan">
+            <div class="scan-item verified">
+              <span class="scan-label">Document Hash</span>
+              <span class="scan-result">✓ Authentic</span>
+            </div>
+            <div class="scan-item verified">
+              <span class="scan-label">Student ID</span>
+              <span class="scan-result">✓ Matched</span>
+            </div>
+            <div class="scan-item verified">
+              <span class="scan-label">Duplicate Check</span>
+              <span class="scan-result">✓ Unique</span>
+            </div>
+            <div class="scan-item warning">
+              <span class="scan-label">Address Anomaly</span>
+              <span class="scan-result">⚠ Flagged</span>
+            </div>
+            <div class="scan-item verified">
+              <span class="scan-label">Bank Verification</span>
+              <span class="scan-result">✓ Confirmed</span>
+            </div>
+          </div>
+          <div class="trust-score">
+            <span>Trust Score</span>
+            <div class="score-bar">
+              <div class="score-fill" style="width:87%"></div>
+            </div>
+            <span class="score-val">87 / 100</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── LOGIN SECTION ── -->
+  <section class="section login-section" id="login-section">
+    <div class="container">
+      <div class="section-label">Access Portal</div>
+      <h2 class="section-title">Choose Your Role</h2>
+      <p class="section-sub">Select how you want to access the ExcessScheme platform.</p>
+      <div class="login-cards">
+
+        <!-- GOV card -->
+        <div class="login-card login-gov" onclick="openLogin('gov')">
+          <div class="lcard-bg"></div>
+          <div class="lcard-icon">🏛️</div>
+          <h3>Government Officer</h3>
+          <p>Manage schemes, allocate budgets, tokenize scholarship funds, review AI flags, and generate audit reports.</p>
+          <ul class="lcard-list">
+            <li>✦ Create &amp; manage schemes</li>
+            <li>✦ Tokenize fund pools</li>
+            <li>✦ Review AI fraud alerts</li>
+            <li>✦ Export compliance reports</li>
+          </ul>
+          <div class="lcard-btn">Login as Gov Officer <span>→</span></div>
+        </div>
+
+        <!-- USER card -->
+        <div class="login-card login-user" onclick="openLogin('user')">
+          <div class="lcard-bg"></div>
+          <div class="lcard-icon">🎓</div>
+          <h3>Student / User</h3>
+          <p>Apply for scholarships, complete AI verification, track your token status, and redeem your scholarship disbursementss.</p>
+          <ul class="lcard-list">
+            <li>✦ Browse available schemes</li>
+            <li>✦ Submit AI verification</li>
+            <li>✦ Track token status</li>
+            <li>✦ Redeem scholarship</li>
+          </ul>
+          <div class="lcard-btn">Login as Student <span>→</span></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="brand-icon">⬡</span>
+        <span class="brand-name">ExcessScheme</span>
+        <p>Transparent. Tokenized. Trustworthy.</p>
+      </div>
+      <div class="footer-links">
+        <div class="fl-col">
+          <span class="fl-head">Platform</span>
+          <a href="gov-dashboard.html">Gov Dashboard</a>
+          <a href="user-dashboard.html">Student Portal</a>
+          <a href="ai-verify.html">AI Verify</a>
+        </div>
+        <div class="fl-col">
+          <span class="fl-head">Built With</span>
+          <a href="#">Algorand ASA</a>
+          <a href="#">AVM Smart Contracts</a>
+          <a href="#">AI Document Model</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 ExcessScheme — Hackathon Project</span>
+    </div>
+  </footer>
+
+  <!-- ── LOGIN MODAL ── -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal-box" id="modalBox">
+      <button class="modal-close" onclick="closeLogin()">✕</button>
+      <div class="modal-logo"><span class="brand-icon">⬡</span> ExcessScheme</div>
+      <h2 class="modal-title" id="modalTitle">Sign In</h2>
+      <p class="modal-sub" id="modalSub">Government Officer Portal</p>
+      <form class="modal-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Officer ID / Student ID</label>
+          <input type="text" id="loginId" placeholder="e.g. GOV-2026-001" required/>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPass" placeholder="••••••••" required/>
+        </div>
+        <div class="form-group" id="otpGroup" style="display:none">
+          <label>2FA OTP</label>
+          <input type="text" id="loginOtp" placeholder="6-digit OTP"/>
+        </div>
+        <button type="submit" class="btn-primary w-full" id="loginBtn">Sign In</button>
+      </form>
+      <p class="modal-note">Demo: any credentials will work.</p>
+    </div>
+  </div>
+
+  <script src="js/theme.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
