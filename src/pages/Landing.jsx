@@ -162,38 +162,42 @@ const BANNER_SLIDES = [
   {
     bg: '/poster1.jpeg',
     tag: 'Digital India Initiative',
-    title: 'India’s Scholarship\nRevolution',
-    sub: 'Blockchain-powered. AI-verified. Fraud-proof distribution of \u20B98,000 Crore across 2.4 million beneficiaries.',
+    title: 'India's Scholarship\nRevolution',
+    sub: 'Blockchain-powered. AI-verified. Fraud-proof distribution of ₹8,000 Crore across 2.4 million beneficiaries.',
     cta1: { label: '🏙️ Explore Platform', href: '#schemes' },
     cta2: { label: '📊 Live Dashboard', action: 'gov' },
     badge: '🟢 Platform Live',
+    gradient: 'from-saffron',
   },
   {
-    bg: '/poster1.jpeg',
+    bg: '/Schemephoto1.png',
     tag: 'PM Fasal Bima Yojana',
     title: 'Protecting Farmers\nEvery Season',
-    sub: '\u20B916,000 Crore tokenised on-chain. Crop insurance payouts verified by AI and released to 5.6 crore farmers instantly.',
+    sub: '₹16,000 Crore tokenised on-chain. Crop insurance payouts verified by AI and released to 5.6 crore farmers instantly.',
     cta1: { label: '🌾 Apply for PMFBY', action: 'user' },
     cta2: { label: '📚 Scheme Details', href: '#schemes' },
     badge: '🟢 Active Scheme',
+    gradient: 'from-green',
   },
   {
-    bg: '/poster1.jpeg',
+    bg: '/Schemephoto2.png',
     tag: 'Mukhyamantri Medhavi Vidyarthi Yojana',
     title: 'Meritocracy Meets\nBlockchain',
     sub: '1.2 lakh students in Madhya Pradesh receive full tuition support via cryptographic tokens — zero leakage, full transparency.',
     cta1: { label: '🎓 Apply for MMVY', action: 'user' },
     cta2: { label: '🔍 Check Eligibility', href: '#schemes' },
     badge: '🟢 Active Scheme',
+    gradient: 'from-blue',
   },
   {
-    bg: '/poster1.jpeg',
+    bg: '/DigitalIndia.png',
     tag: 'AI Fraud Prevention',
     title: 'Zero Corruption.\nZero False Payouts.',
     sub: '7-layer AI pipeline — Aadhaar OTP, OCR forgery detection, duplicate screening — runs in under 2 seconds before any token is minted.',
     cta1: { label: '🤖 Try AI Verification', href: '/ai-verify' },
     cta2: { label: '📄 View Audit Trail', action: 'gov' },
     badge: '🟡 AI Engine Active',
+    gradient: 'from-purple',
   },
 ]
 
@@ -318,10 +322,11 @@ export default function Landing() {
         {BANNER_SLIDES.map((s, i) => (
           <div
             key={i}
-            className={`banner-slide${i === slide ? ' active' : ''}`}
+            className={`banner-slide${i === slide ? ' active' : ''} ${s.gradient || ''}`}
             style={{ backgroundImage:`url('${s.bg}')` }}
           >
             <div className="banner-overlay" />
+            <div className="banner-gradient-accent" />
             <div className="banner-content">
               <span className="banner-tag">{s.badge}</span>
               <p className="banner-ministry">{s.tag}</p>

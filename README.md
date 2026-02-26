@@ -5,6 +5,28 @@
 
 ---
 
+## 📸 Screenshots
+
+<div align="center">
+
+### 🖼️ Platform Banners
+
+| Banner 1 | Banner 2 |
+|:--------:|:--------:|
+| ![Banner 1](public/banner1.jpg) | ![Banner 2](public/banner2.jpg) |
+
+| Banner 3 | Banner 4 |
+|:--------:|:--------:|
+| ![Banner 3](public/banner3.jpg) | ![Banner 4](public/banner4.jpg) |
+
+| Banner 5 | Banner 6 |
+|:--------:|:--------:|
+| ![Banner 5](public/BANNER5.png) | ![Banner 6](public/Banner6.png) |
+
+</div>
+
+---
+
 ## 🌍 Overview
 
 ExcessScheme is a decentralized mediator platform built on the **Algorand Blockchain** to tokenize, distribute, and track government schemes, scholarships, and NGO donations.
