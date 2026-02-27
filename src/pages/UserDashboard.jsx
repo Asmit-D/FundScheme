@@ -13,6 +13,17 @@ import {
   APP_ID,
 } from '../lib/scholarship-contract'
 import { loadAddress } from '../lib/perawallet'
+import {
+  registerSchemeApplicant,
+  optInToSchemeToken,
+  getBeneficiarySchemeStatus,
+  getCachedSchemes,
+  BENEFICIARY_STATUS,
+  getBeneficiaryStatusLabel,
+} from '../lib/scheme-service'
+import {
+  isOptedInToToken,
+} from '../lib/fund-token'
 
 const TABS = [
   { id:'overview',     icon:'📊', label:'My Overview' },
@@ -81,6 +92,14 @@ export default function UserDashboard() {
   const [chainTx,       setChainTx]       = useState(null)
   const [chainAction,   setChainAction]   = useState(null)
 
+  // ── Scheme Registration State ───────────────────────────
+  const [applyingScheme, setApplyingScheme] = useState(false)
+  const [applyError, setApplyError] = useState(null)
+  const [applySuccess, setApplySuccess] = useState(null)
+  const [onChainSchemes, setOnChainSchemes] = useState([])
+  const [schemeStatuses, setSchemeStatuses] = useState({})
+  const [tokenRegistering, setTokenRegistering] = useState(false)
+
   const refreshChainStatus = useCallback(async (addr) => {
     setChainLoading(true)
     setChainError(null)
@@ -127,6 +146,81 @@ export default function UserDashboard() {
       )
     } finally {
       setChainAction(null)
+    }
+  }
+
+  // ── Scheme Application Handler ──────────────────────────
+  const handleApplyScheme = async (scheme, formData) => {
+    const addr = loadAddress()
+    if (!addr) {
+      setApplyError('Please connect your wallet first via ◎ Wallet')
+      return
+    }
+
+    setApplyingScheme(true)
+    setApplyError(null)
+    setApplySuccess(null)
+
+    try {
+      // If scheme has an on-chain ID, register on the blockchain
+      if (scheme.onChainId) {
+        const result = await registerSchemeApplicant(BigInt(scheme.onChainId), addr)
+        if (!result.success) {
+          setApplyError(result.error)
+          return
+        }
+        setApplySuccess({
+          message: 'Application submitted on-chain!',
+          txID: result.txID,
+          schemeName: scheme.name,
+        })
+      } else {
+        // Traditional off-chain application
+        setApplySuccess({
+          message: 'Application submitted! AI verification will begin automatically.',
+          schemeName: scheme.name,
+        })
+      }
+
+      // Close modal after 2 seconds
+      setTimeout(() => {
+        setApplyModal(null)
+        setApplySuccess(null)
+      }, 2500)
+
+    } catch (err) {
+      setApplyError(err.message || 'Failed to submit application')
+    } finally {
+      setApplyingScheme(false)
+    }
+  }
+
+  // ── Token Opt-in Handler ────────────────────────────────
+  const handleTokenOptIn = async (assetId) => {
+    const addr = loadAddress()
+    if (!addr) {
+      setChainError('Please connect your wallet first')
+      return
+    }
+
+    setTokenRegistering(true)
+    try {
+      const alreadyOptedIn = await isOptedInToToken(addr, assetId)
+      if (alreadyOptedIn) {
+        setChainError('Already opted into this token')
+        return
+      }
+
+      const result = await optInToSchemeToken(assetId)
+      if (result.success) {
+        setChainTx(result.txID)
+      } else {
+        setChainError(result.error)
+      }
+    } catch (err) {
+      setChainError(err.message || 'Failed to opt-in to token')
+    } finally {
+      setTokenRegistering(false)
     }
   }
   const navigate = useNavigate()
@@ -497,23 +591,102 @@ export default function UserDashboard() {
 
       {/* APPLY MODAL */}
       {applyModal && (
-        <div className="modal-overlay open" onClick={e=>e.target===e.currentTarget&&setApplyModal(null)}>
-          <div className="modal-box" style={{ maxWidth:'500px' }}>
-            <button className="modal-close" onClick={() => setApplyModal(null)}>✕</button>
+        <div className="modal-overlay open" onClick={e=>e.target===e.currentTarget && !applyingScheme && setApplyModal(null)}>
+          <div className="modal-box" style={{ maxWidth:'540px' }}>
+            <button className="modal-close" onClick={() => !applyingScheme && setApplyModal(null)} disabled={applyingScheme}>✕</button>
             <div className="modal-title">Apply — {applyModal.name}</div>
             <div className="modal-sub">Amount: ₹{applyModal.amount?.toLocaleString()} · Deadline: {applyModal.deadline}</div>
+
+            {/* Success Message */}
+            {applySuccess && (
+              <div style={{ background:'rgba(16,185,129,.12)', border:'1px solid rgba(16,185,129,.3)', borderRadius:'10px', padding:'1rem', marginBottom:'1rem', color:'#10b981' }}>
+                <div style={{ fontWeight:600, marginBottom:'.3rem' }}>✅ {applySuccess.message}</div>
+                {applySuccess.txID && (
+                  <a href={`https://testnet.algoexplorer.io/tx/${applySuccess.txID}`} target="_blank" rel="noreferrer" style={{ color:'#10b981', fontSize:'.85rem' }}>
+                    View transaction on AlgoExplorer ↗
+                  </a>
+                )}
+              </div>
+            )}
+
+            {/* Error Message */}
+            {applyError && (
+              <div style={{ background:'rgba(239,68,68,.12)', border:'1px solid rgba(239,68,68,.3)', borderRadius:'10px', padding:'1rem', marginBottom:'1rem', color:'#ef4444', fontSize:'.9rem' }}>
+                ❌ {applyError}
+              </div>
+            )}
+
             <div className="modal-form">
-              <div className="form-group"><label>Full Name</label><input type="text" defaultValue="Priya Kumari" /></div>
-              <div className="form-group"><label>Student ID</label><input type="text" defaultValue="STU-2026-0042" /></div>
-              <div className="form-group"><label>Institution</label><input type="text" placeholder="Your college/school" /></div>
-              <div className="form-group"><label>Family Annual Income (₹)</label><input type="number" placeholder="Enter income" /></div>
-              <button
-                type="button"
-                className="btn-primary w-full"
-                onClick={() => { alert('Application submitted! AI verification will begin automatically.'); setApplyModal(null) }}
-              >
-                Submit Application
-              </button>
+              <div className="form-group">
+                <label>Full Name</label>
+                <input type="text" id="applyName" defaultValue="Priya Kumari" disabled={applyingScheme} />
+              </div>
+              <div className="form-group">
+                <label>Student ID</label>
+                <input type="text" id="applyStudentId" defaultValue="STU-2026-0042" disabled={applyingScheme} />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Institution</label>
+                  <input type="text" id="applyInst" placeholder="Your college/school" disabled={applyingScheme} />
+                </div>
+                <div className="form-group">
+                  <label>Course</label>
+                  <input type="text" id="applyCourse" placeholder="e.g. B.Tech CSE" disabled={applyingScheme} />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Family Annual Income (₹)</label>
+                <input type="number" id="applyIncome" placeholder="Enter annual family income" disabled={applyingScheme} />
+              </div>
+
+              {/* On-chain registration info */}
+              <div style={{ background:'rgba(99,102,241,.08)', borderRadius:'10px', padding:'.85rem 1rem', marginBottom:'1rem', fontSize:'.85rem', lineHeight:1.6 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:'.5rem', marginBottom:'.4rem' }}>
+                  <span>⛓️</span>
+                  <strong>On-Chain Registration</strong>
+                </div>
+                <div style={{ color:'var(--text-2)' }}>
+                  Your application will be registered on the Algorand blockchain for transparency. 
+                  You'll need to sign the transaction with Pera Wallet.
+                </div>
+              </div>
+
+              <div style={{ display:'flex', gap:'.75rem' }}>
+                <button
+                  type="button"
+                  className="btn-primary"
+                  style={{ flex:1 }}
+                  onClick={() => handleApplyScheme(applyModal, {
+                    name: document.getElementById('applyName')?.value,
+                    studentId: document.getElementById('applyStudentId')?.value,
+                    institution: document.getElementById('applyInst')?.value,
+                    course: document.getElementById('applyCourse')?.value,
+                    income: document.getElementById('applyIncome')?.value,
+                  })}
+                  disabled={applyingScheme}
+                >
+                  {applyingScheme ? (
+                    <>⏳ Submitting...</>
+                  ) : (
+                    <>📝 Submit & Register On-Chain</>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="btn-sm btn-view"
+                  style={{ padding:'.6rem 1rem' }}
+                  onClick={() => setApplyModal(null)}
+                  disabled={applyingScheme}
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <div style={{ marginTop:'.85rem', fontSize:'.75rem', color:'var(--text-3)', lineHeight:1.5 }}>
+                By submitting, you consent to AI verification of your documents. 
+                Your application will be visible on the blockchain for transparency.
+              </div>
             </div>
           </div>
         </div>

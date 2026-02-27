@@ -19,15 +19,23 @@ let db
 
 async function getDb() {
   if (db) return db
-  client = new MongoClient(MONGO_URI, {
-    serverSelectionTimeoutMS: 8000,
-    tls: true,
-    tlsAllowInvalidCertificates: true,
-  })
-  await client.connect()
-  db = client.db(DB_NAME)
-  console.log(`  ✓ MongoDB connected — database: ${DB_NAME}`)
-  return db
+  try {
+    client = new MongoClient(MONGO_URI, {
+      serverSelectionTimeoutMS: 8000,
+      tls: true,
+      tlsAllowInvalidCertificates: true,
+      retryWrites: true,
+      w: 'majority',
+    })
+    await client.connect()
+    db = client.db(DB_NAME)
+    console.log(`  ✓ MongoDB connected — database: ${DB_NAME}`)
+    return db
+  } catch (err) {
+    console.log(`  ⚠ MongoDB connection skipped (${err.message?.slice(0, 50)}...)`)
+    console.log(`  → Running in offline mode — using mock data`)
+    return null
+  }
 }
 
 // ── Express setup ─────────────────────────────────────────────────────
@@ -46,7 +54,10 @@ function normalize(doc) {
 // ── Health check ─────────────────────────────────────────────────────
 app.get('/api/health', async (_req, res) => {
   try {
-    await getDb()
+    const database = await getDb()
+    if (!database) {
+      return res.json({ ok: true, db: 'offline-mode', message: 'Running without MongoDB' })
+    }
     res.json({ ok: true, db: DB_NAME })
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message })
@@ -61,6 +72,9 @@ app.get('/api/health', async (_req, res) => {
 app.post('/api/mongo/find', async (req, res) => {
   try {
     const database = await getDb()
+    if (!database) {
+      return res.json({ data: [], error: null, offline: true })
+    }
     const { collection, filter = {}, options = {}, one = false } = req.body
     const col = database.collection(collection)
     if (one) {
@@ -78,6 +92,9 @@ app.post('/api/mongo/find', async (req, res) => {
 app.post('/api/mongo/insertOne', async (req, res) => {
   try {
     const database = await getDb()
+    if (!database) {
+      return res.json({ data: null, error: 'Database offline', offline: true })
+    }
     const { collection, document } = req.body
     const doc = { ...document, createdAt: new Date(), updatedAt: new Date() }
     const result = await database.collection(collection).insertOne(doc)
@@ -91,6 +108,9 @@ app.post('/api/mongo/insertOne', async (req, res) => {
 app.post('/api/mongo/insertMany', async (req, res) => {
   try {
     const database = await getDb()
+    if (!database) {
+      return res.json({ data: null, error: 'Database offline', offline: true })
+    }
     const { collection, documents } = req.body
     const now = new Date()
     const docs = documents.map(d => ({ ...d, createdAt: now, updatedAt: now }))
@@ -105,6 +125,9 @@ app.post('/api/mongo/insertMany', async (req, res) => {
 app.post('/api/mongo/updateOne', async (req, res) => {
   try {
     const database = await getDb()
+    if (!database) {
+      return res.json({ data: null, error: 'Database offline', offline: true })
+    }
     const { collection, filter, update, upsert = false } = req.body
     const updateDoc = { ...update, $set: { ...(update.$set || {}), updatedAt: new Date() } }
     const result = await database.collection(collection).findOneAndUpdate(
@@ -120,6 +143,9 @@ app.post('/api/mongo/updateOne', async (req, res) => {
 app.post('/api/mongo/deleteOne', async (req, res) => {
   try {
     const database = await getDb()
+    if (!database) {
+      return res.json({ data: null, error: 'Database offline', offline: true })
+    }
     const { collection, filter } = req.body
     const result = await database.collection(collection).deleteOne(filter)
     return res.json({ data: { deletedCount: result.deletedCount }, error: null })
@@ -132,6 +158,9 @@ app.post('/api/mongo/deleteOne', async (req, res) => {
 app.post('/api/mongo/aggregate', async (req, res) => {
   try {
     const database = await getDb()
+    if (!database) {
+      return res.json({ data: [], error: null, offline: true })
+    }
     const { collection, pipeline } = req.body
     const docs = await database.collection(collection).aggregate(pipeline).toArray()
     return res.json({ data: normalize(docs), error: null })
@@ -144,6 +173,9 @@ app.post('/api/mongo/aggregate', async (req, res) => {
 app.post('/api/mongo/count', async (req, res) => {
   try {
     const database = await getDb()
+    if (!database) {
+      return res.json({ data: 0, error: null, offline: true })
+    }
     const { collection, filter = {} } = req.body
     const count = await database.collection(collection).countDocuments(filter)
     return res.json({ data: count, error: null })
@@ -156,6 +188,9 @@ app.post('/api/mongo/count', async (req, res) => {
 app.post('/api/mongo/upsertOne', async (req, res) => {
   try {
     const database = await getDb()
+    if (!database) {
+      return res.json({ data: null, error: 'Database offline', offline: true })
+    }
     const { collection, filter, document } = req.body
     const doc = { ...document, updatedAt: new Date() }
     const result = await database.collection(collection).findOneAndUpdate(

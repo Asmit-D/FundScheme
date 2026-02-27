@@ -13,6 +13,19 @@ import {
   APP_ID,
 } from '../lib/scholarship-contract'
 import { loadAddress } from '../lib/perawallet'
+import {
+  createFullScheme,
+  activateScheme,
+  pauseActiveScheme,
+  addFundsToScheme,
+  approveSchemeApplicant,
+  disburseFunds,
+  getSchemeStatistics,
+  getCachedSchemes,
+  SCHEME_STATUS,
+  getSchemeStatusLabel,
+  getSchemeStatusColor,
+} from '../lib/scheme-service'
 
 const TABS = [
   { id:'overview',     icon:'📊', label:'Overview' },
@@ -101,6 +114,23 @@ export default function GovDashboard() {
   const [studentTarget,   setStudentTarget]   = useState('')
   const [studentState,    setStudentState]    = useState(null)
 
+  // ── Create Scheme Form State ────────────────────────
+  const [schemeForm, setSchemeForm] = useState({
+    name: '',
+    category: 'Merit',
+    amountPerStudent: '',
+    totalBudgetCr: '',
+    deadline: '',
+    criteria: '',
+    ministry: 'Ministry of Education',
+    maxBeneficiaries: '',
+    createToken: true,
+  })
+  const [schemeCreating, setSchemeCreating] = useState(false)
+  const [schemeProgress, setSchemeProgress] = useState(null)
+  const [schemeError, setSchemeError] = useState(null)
+  const [schemeSuccess, setSchemeSuccess] = useState(null)
+
   const loadGlobal = useCallback(async () => {
     setContractLoading(true)
     setContractError(null)
@@ -124,6 +154,66 @@ export default function GovDashboard() {
       const s = await getStudentState(studentTarget.trim())
       setStudentState(s)
     } catch { setStudentState(null) }
+  }
+
+  // ── Scheme Creation Handler ─────────────────────────
+  const handleCreateScheme = async () => {
+    setSchemeCreating(true)
+    setSchemeError(null)
+    setSchemeSuccess(null)
+    setSchemeProgress(null)
+
+    try {
+      const result = await createFullScheme(
+        {
+          name: schemeForm.name,
+          category: schemeForm.category,
+          amountPerStudent: parseInt(schemeForm.amountPerStudent) || 0,
+          totalBudgetCr: parseFloat(schemeForm.totalBudgetCr) || 0,
+          deadline: schemeForm.deadline,
+          criteria: schemeForm.criteria,
+          ministry: schemeForm.ministry,
+          maxBeneficiaries: parseInt(schemeForm.maxBeneficiaries) || 0,
+          createToken: schemeForm.createToken,
+        },
+        (progress) => setSchemeProgress(progress)
+      )
+
+      if (result.success) {
+        setSchemeSuccess({
+          schemeId: result.schemeId?.toString(),
+          tokenAssetId: result.tokenAssetId,
+          txID: result.txID,
+        })
+        // Reset form after 3 seconds
+        setTimeout(() => {
+          setShowCreateScheme(false)
+          setSchemeSuccess(null)
+          setSchemeForm({
+            name: '',
+            category: 'Merit',
+            amountPerStudent: '',
+            totalBudgetCr: '',
+            deadline: '',
+            criteria: '',
+            ministry: 'Ministry of Education',
+            maxBeneficiaries: '',
+            createToken: true,
+          })
+        }, 3000)
+      } else {
+        setSchemeError(result.error)
+      }
+    } catch (err) {
+      setSchemeError(err.message || 'Failed to create scheme')
+    } finally {
+      setSchemeCreating(false)
+      setSchemeProgress(null)
+    }
+  }
+
+  const updateSchemeForm = (field, value) => {
+    setSchemeForm(prev => ({ ...prev, [field]: value }))
   }
 
   const runContractOp = async (label, fn) => {
@@ -589,25 +679,199 @@ export default function GovDashboard() {
 
       {/* CREATE SCHEME MODAL */}
       {showCreateScheme && (
-        <div className="modal-overlay open" onClick={e=>e.target===e.currentTarget&&setShowCreateScheme(false)}>
-          <div className="modal-box" style={{ maxWidth:'560px' }}>
-            <button className="modal-close" onClick={() => setShowCreateScheme(false)}>✕</button>
+        <div className="modal-overlay open" onClick={e=>e.target===e.currentTarget && !schemeCreating && setShowCreateScheme(false)}>
+          <div className="modal-box" style={{ maxWidth:'620px' }}>
+            <button className="modal-close" onClick={() => !schemeCreating && setShowCreateScheme(false)} disabled={schemeCreating}>✕</button>
             <div className="modal-title">Create New Scheme</div>
-            <div className="modal-sub">Define the scheme parameters for tokenization.</div>
+            <div className="modal-sub">Define the scheme parameters. This will create an on-chain smart contract.</div>
+
+            {/* Success Message */}
+            {schemeSuccess && (
+              <div style={{ background:'rgba(16,185,129,.12)', border:'1px solid rgba(16,185,129,.3)', borderRadius:'10px', padding:'1rem', marginBottom:'1rem', color:'#10b981' }}>
+                <div style={{ fontWeight:600, marginBottom:'.5rem' }}>✅ Scheme Created Successfully!</div>
+                <div style={{ fontSize:'.85rem', lineHeight:1.6 }}>
+                  <div>Scheme ID: <code style={{ color:'var(--accent)' }}>{schemeSuccess.schemeId}</code></div>
+                  {schemeSuccess.tokenAssetId && (
+                    <div>Token Asset ID: <code style={{ color:'var(--accent)' }}>{schemeSuccess.tokenAssetId}</code></div>
+                  )}
+                  <a href={`https://testnet.algoexplorer.io/tx/${schemeSuccess.txID}`} target="_blank" rel="noreferrer" style={{ color:'#10b981', fontWeight:500 }}>
+                    View on AlgoExplorer ↗
+                  </a>
+                </div>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {schemeError && (
+              <div style={{ background:'rgba(239,68,68,.12)', border:'1px solid rgba(239,68,68,.3)', borderRadius:'10px', padding:'1rem', marginBottom:'1rem', color:'#ef4444', fontSize:'.9rem' }}>
+                ❌ {schemeError}
+              </div>
+            )}
+
+            {/* Progress Indicator */}
+            {schemeProgress && (
+              <div style={{ background:'rgba(99,102,241,.1)', border:'1px solid rgba(99,102,241,.25)', borderRadius:'10px', padding:'1rem', marginBottom:'1rem' }}>
+                <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'.5rem', fontSize:'.85rem', color:'var(--text-2)' }}>
+                  <span>{schemeProgress.message}</span>
+                  <span>Step {schemeProgress.step}/{schemeProgress.total}</span>
+                </div>
+                <div style={{ height:'4px', background:'rgba(255,255,255,.1)', borderRadius:'2px', overflow:'hidden' }}>
+                  <div style={{ height:'100%', width:`${(schemeProgress.step / schemeProgress.total) * 100}%`, background:'linear-gradient(90deg, #6366f1, #818cf8)', transition:'width .3s ease' }}></div>
+                </div>
+              </div>
+            )}
+
             <div className="modal-form">
-              <div className="form-group"><label>Scheme Name</label><input type="text" placeholder="e.g. National Merit Award 2026" /></div>
-              <div className="form-row">
-                <div className="form-group"><label>Category</label><select className="filter-select" style={{width:'100%'}}><option>Merit</option><option>Need-Based</option><option>Disability</option><option>Minority</option></select></div>
-                <div className="form-group"><label>Amount per Student (₹)</label><input type="number" placeholder="50000" /></div>
+              <div className="form-group">
+                <label>Scheme Name *</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. National Merit Award 2026" 
+                  value={schemeForm.name}
+                  onChange={e => updateSchemeForm('name', e.target.value)}
+                  disabled={schemeCreating}
+                />
               </div>
+
               <div className="form-row">
-                <div className="form-group"><label>Total Budget (₹ Cr)</label><input type="number" placeholder="50" /></div>
-                <div className="form-group"><label>Deadline</label><input type="date" /></div>
+                <div className="form-group">
+                  <label>Category</label>
+                  <select 
+                    className="filter-select" 
+                    style={{width:'100%'}} 
+                    value={schemeForm.category}
+                    onChange={e => updateSchemeForm('category', e.target.value)}
+                    disabled={schemeCreating}
+                  >
+                    <option>Merit</option>
+                    <option>Need-Based</option>
+                    <option>Disability</option>
+                    <option>Minority</option>
+                    <option>Research</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Ministry / Department</label>
+                  <select 
+                    className="filter-select" 
+                    style={{width:'100%'}}
+                    value={schemeForm.ministry}
+                    onChange={e => updateSchemeForm('ministry', e.target.value)}
+                    disabled={schemeCreating}
+                  >
+                    <option>Ministry of Education</option>
+                    <option>Ministry of Social Justice</option>
+                    <option>Ministry of Minority Affairs</option>
+                    <option>Ministry of Home Affairs</option>
+                    <option>AICTE</option>
+                    <option>UGC</option>
+                    <option>DST</option>
+                  </select>
+                </div>
               </div>
-              <div className="form-group"><label>Eligibility Criteria</label><input type="text" placeholder="Describe criteria…" /></div>
-              <button className="btn-primary w-full" onClick={() => { alert('Scheme created!'); setShowCreateScheme(false) }}>
-                Create & Tokenize
-              </button>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Amount per Student (₹) *</label>
+                  <input 
+                    type="number" 
+                    placeholder="50000" 
+                    value={schemeForm.amountPerStudent}
+                    onChange={e => updateSchemeForm('amountPerStudent', e.target.value)}
+                    disabled={schemeCreating}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Total Budget (₹ Cr) *</label>
+                  <input 
+                    type="number" 
+                    placeholder="50" 
+                    step="0.01"
+                    value={schemeForm.totalBudgetCr}
+                    onChange={e => updateSchemeForm('totalBudgetCr', e.target.value)}
+                    disabled={schemeCreating}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Application Deadline *</label>
+                  <input 
+                    type="date" 
+                    value={schemeForm.deadline}
+                    onChange={e => updateSchemeForm('deadline', e.target.value)}
+                    disabled={schemeCreating}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Max Beneficiaries</label>
+                  <input 
+                    type="number" 
+                    placeholder="10000 (0 = unlimited)" 
+                    value={schemeForm.maxBeneficiaries}
+                    onChange={e => updateSchemeForm('maxBeneficiaries', e.target.value)}
+                    disabled={schemeCreating}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Eligibility Criteria</label>
+                <textarea 
+                  placeholder="Describe eligibility criteria (income limits, category requirements, academic qualifications)…"
+                  style={{ minHeight:'80px', resize:'vertical', padding:'.6rem .8rem', borderRadius:'8px', border:'1px solid var(--border-2)', background:'var(--bg)', color:'var(--text)', width:'100%', fontFamily:'inherit' }}
+                  value={schemeForm.criteria}
+                  onChange={e => updateSchemeForm('criteria', e.target.value)}
+                  disabled={schemeCreating}
+                ></textarea>
+              </div>
+
+              <div style={{ display:'flex', alignItems:'center', gap:'.75rem', padding:'.75rem 1rem', background:'rgba(99,102,241,.08)', borderRadius:'10px', marginBottom:'1rem' }}>
+                <input 
+                  type="checkbox" 
+                  id="createToken" 
+                  checked={schemeForm.createToken}
+                  onChange={e => updateSchemeForm('createToken', e.target.checked)}
+                  disabled={schemeCreating}
+                  style={{ width:'18px', height:'18px', accentColor:'#6366f1' }}
+                />
+                <label htmlFor="createToken" style={{ cursor:'pointer', flex:1 }}>
+                  <div style={{ fontWeight:500, fontSize:'.9rem' }}>Create Scheme Token (ASA)</div>
+                  <div style={{ fontSize:'.78rem', color:'var(--text-2)', marginTop:'.15rem' }}>
+                    Mint trackable tokens on Algorand for each disbursement
+                  </div>
+                </label>
+              </div>
+
+              <div style={{ display:'flex', gap:'.75rem' }}>
+                <button 
+                  className="btn-primary" 
+                  style={{ flex:1 }}
+                  onClick={handleCreateScheme}
+                  disabled={schemeCreating || !schemeForm.name || !schemeForm.amountPerStudent || !schemeForm.totalBudgetCr || !schemeForm.deadline}
+                >
+                  {schemeCreating ? (
+                    <>⏳ Creating Scheme...</>
+                  ) : (
+                    <>⛓️ Create On-Chain</>
+                  )}
+                </button>
+                <button 
+                  className="btn-sm btn-view" 
+                  style={{ padding:'.6rem 1.2rem' }}
+                  onClick={() => setShowCreateScheme(false)}
+                  disabled={schemeCreating}
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <div style={{ marginTop:'1rem', padding:'.75rem', background:'rgba(255,255,255,.03)', borderRadius:'8px', fontSize:'.78rem', color:'var(--text-3)', lineHeight:1.6 }}>
+                <strong>Note:</strong> Creating a scheme will deploy a smart contract on Algorand TestNet. 
+                You'll need to sign the transaction with Pera Wallet. 
+                Connect your wallet first via the ◎ Wallet button.
+              </div>
             </div>
           </div>
         </div>
